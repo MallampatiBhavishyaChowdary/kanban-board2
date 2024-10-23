@@ -1,0 +1,106 @@
+<html>
+<head>
+    <title>Interactive Task Board</title>
+    <script src="https://unpkg.com/react/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
+    <script type="text/babel">
+        const tasks = [
+            { id: 'CAM-2', title: 'Implement Email Notification System', priority: 'No priority', type: 'Feature Request', assignee: 'AS', status: 'Todo' },
+            { id: 'CAM-3', title: 'Optimize Database Queries for Performance', priority: 'No priority', type: 'Feature Request', assignee: 'AS', status: 'In Progress' },
+            { id: 'CAM-4', title: 'Add Multi-Language Support', priority: 'Urgent', type: 'Feature Request', assignee: 'AS', status: 'Todo' },
+            { id: 'CAM-11', title: 'Conduct Security Vulnerability Assessment', priority: 'Urgent', type: 'Feature Request', assignee: 'AS', status: 'Done' },
+            { id: 'CAM-6', title: 'Enhance Search Functionality', priority: 'High', type: 'Feature Request', assignee: 'AS', status: 'Done' },
+            { id: 'CAM-8', title: 'Create Onboarding Tutorial for New Users', priority: 'High', type: 'Feature Request', assignee: 'AS', status: 'Todo' },
+            { id: 'CAM-1', title: 'Update User Profile Page UI', priority: 'High', type: 'Feature Request', assignee: 'AS', status: 'Todo' },
+            { id: 'CAM-7', title: 'Integrate Third-Party Payment Gateway', priority: 'Medium', type: 'Feature Request', assignee: 'AS', status: 'Done' },
+            { id: 'CAM-9', title: 'Implement Role-Based Access Control (RBAC)', priority: 'Medium', type: 'Feature Request', assignee: 'AS', status: 'Done' },
+            { id: 'CAM-10', title: 'Upgrade Server Infrastructure', priority: 'Low', type: 'Feature Request', assignee: 'AS', status: 'Done' },
+            { id: 'CAM-5', title: 'Add Multi-Language Support - Enable multi-language support within the...', priority: 'Low', type: 'Feature Request', assignee: 'AS', status: 'Todo' },
+        ];
+
+        const priorities = ['Urgent', 'High', 'Medium', 'Low', 'No priority'];
+        const statuses = ['Todo', 'In Progress', 'Done', 'Canceled'];
+
+        const TaskCard = ({ task }) => (
+            <div className="bg-white p-4 rounded-lg shadow-md mb-4">
+                <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">{task.id}</h3>
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold">{task.assignee}</span>
+                    </div>
+                </div>
+                <p className="text-gray-700 mt-2">{task.title}</p>
+                <p className="text-gray-500 text-sm mt-1">{task.type}</p>
+            </div>
+        );
+
+        const TaskColumn = ({ name, tasks }) => (
+            <div className="w-1/4 p-2">
+                <div className="bg-gray-100 p-4 rounded-lg shadow-md">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-semibold">{name}</h2>
+                        <button className="text-gray-500">
+                            <i className="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                    {tasks.map(task => (
+                        <TaskCard key={task.id} task={task} />
+                    ))}
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [grouping, setGrouping] = React.useState('Status');
+            const [ordering, setOrdering] = React.useState('Priority');
+
+            const groupedTasks = grouping === 'Status' ? statuses : priorities;
+            const orderedTasks = (tasks) => {
+                if (ordering === 'Priority') {
+                    return tasks.sort((a, b) => priorities.indexOf(a.priority) - priorities.indexOf(b.priority));
+                }
+                return tasks;
+            };
+
+            return (
+                <div className="p-8">
+                    <div className="flex justify-between items-center mb-8">
+                        <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg">
+                            <i className="fas fa-filter mr-2"></i> Display
+                        </button>
+                        <div className="flex items-center space-x-4">
+                            <div className="flex items-center">
+                                <span className="text-gray-700 mr-2">Grouping</span>
+                                <select className="border border-gray-300 rounded-md p-1" value={grouping} onChange={(e) => setGrouping(e.target.value)}>
+                                    <option>Status</option>
+                                    <option>Priority</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center">
+                                <span className="text-gray-700 mr-2">Ordering</span>
+                                <select className="border border-gray-300 rounded-md p-1" value={ordering} onChange={(e) => setOrdering(e.target.value)}>
+                                    <option>Priority</option>
+                                    <option>Status</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex space-x-4">
+                        {groupedTasks.map(group => (
+                            <TaskColumn key={group} name={group} tasks={orderedTasks(tasks.filter(task => task[grouping.toLowerCase()] === group))} />
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
